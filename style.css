@@ -32,3 +32,51 @@ h1 {
 p {
   margin-bottom: 1.5rem;
 }
+
+/* First section in the page, so this introduces the base spacing and
+   heading size for any section — this one and any added later. */
+
+section {
+  margin-top: 3rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  line-height: 1.2;
+  margin-bottom: 0.75rem;
+}
+
+/* Three project cards in a row. CSS Grid gives exact control over "3 across,
+   then 1 down on a phone" without relying on flex-wrap's implicit wrapping.
+   Card borders use currentColor instead of a fixed color so they keep working
+   in both light and dark mode, the same free trick color-scheme already buys us. */
+
+.project-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.project-card {
+  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  padding: 1rem;
+}
+
+.project-card h3 {
+  font-size: 1.125rem;
+  margin-bottom: 0.5rem;
+}
+
+.project-card p {
+  margin-bottom: 0.75rem;
+}
+
+/* The page's first breakpoint. 37.5rem (600px) sits comfortably above real
+   phone widths and comfortably below laptop widths, so cards stack on a
+   phone and stay in a row everywhere wider. */
+
+@media (max-width: 37.5rem) {
+  .project-cards {
+    grid-template-columns: 1fr;
+  }
+}
