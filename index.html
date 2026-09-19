@@ -3,44 +3,545 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hello</title>
+  <meta name="color-scheme" content="only light">
+  <meta name="darkreader-lock">
+  <title>Study Room</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h1>Hello, world.</h1>
+  <main id="study-room" class="desk">
 
-  <p>
-    This page is live. That is the only thing it is here to prove.
-  </p>
+    <header class="card sign">
+      <p class="sign-tag">Est. 2026 &middot; Quiet study hours</p>
+      <h1>Study Room</h1>
+      <p>
+        This is how I plan a study day, hour by hour. Want to see what it looks
+        like with your own tasks instead?
+      </p>
+    </header>
 
-  <p>
-    Everything about it is yours to delete. Open Claude Code in this folder and
-    tell it what you actually want to build.
-  </p>
+    <section class="card clock-card" aria-label="Clock">
+      <span class="card-label">Right now</span>
+      <span id="live-clock-time" class="live-clock-time">--:--:--</span>
+      <p id="now-line" class="now-line">Loading...</p>
+    </section>
 
-  <section id="projects">
-    <h2>Projects</h2>
-    <div class="project-cards">
-      <article class="project-card">
-        <h3>Trail map</h3>
-        <p>A map of my favorite hikes, drawn in QGIS.</p>
-        <a href="https://github.com/me/trail-map">Repo</a>
-      </article>
+    <section class="card schedule-card" aria-label="Schedule">
+      <div class="card-head">
+        <h2>Today</h2>
+        <div class="study-room-controls">
+          <span class="arrow-hint" aria-hidden="true">&#128073;</span>
+          <button id="try-it-button" class="cartoon-button" type="button">Try it yourself</button>
+          <button id="view-example-button" class="cartoon-button cartoon-button-secondary" type="button" hidden>
+            View my example
+          </button>
+          <button id="add-row-button" class="cartoon-button cartoon-button-secondary" type="button" hidden>
+            Add a row
+          </button>
+        </div>
+      </div>
 
-      <article class="project-card">
-        <h3>&lt;project two name&gt;</h3>
-        <p>&lt;one line on what it is&gt;</p>
-        <a href="#">&lt;link to it&gt;</a>
-      </article>
+      <div id="schedule-scroll" class="schedule-scroll">
+        <table class="study-table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Task</th>
+              <th>Done</th>
+              <th><span class="visually-hidden">Remove</span></th>
+            </tr>
+          </thead>
+          <tbody id="study-table-body">
+            <!-- filled in by the script at the bottom of the page -->
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-      <article class="project-card">
-        <h3>&lt;project three name&gt;</h3>
-        <p>&lt;one line on what it is&gt;</p>
-        <a href="#">&lt;link to it&gt;</a>
-      </article>
-    </div>
-  </section>
+    <section class="card pomo-card" aria-label="Pomodoro timer">
+      <div class="card-head">
+        <h2>Focus timer</h2>
+        <div class="chips">
+          <button id="pomo-focus" class="chip chip-on" type="button">Focus 25</button>
+          <button id="pomo-break" class="chip" type="button">Break 5</button>
+        </div>
+      </div>
+      <div id="pomo-time" class="pomo-time">25:00</div>
+      <div class="pomo-buttons">
+        <button id="pomo-start" class="cartoon-button" type="button">Start</button>
+        <button id="pomo-reset" class="cartoon-button cartoon-button-secondary" type="button">Reset</button>
+      </div>
+    </section>
+
+    <section class="card progress-card" aria-label="Progress">
+      <h2>Done today</h2>
+      <p id="progress-text" class="progress-text">0 of 0</p>
+      <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-bar">
+        <div id="progress-fill" class="progress-fill"></div>
+      </div>
+    </section>
+
+    <section class="card notes-card" aria-label="Top three goals">
+      <h2>Top 3 today</h2>
+      <input class="note" type="text" maxlength="60" placeholder="Goal 1" aria-label="Goal 1">
+      <input class="note" type="text" maxlength="60" placeholder="Goal 2" aria-label="Goal 2">
+      <input class="note" type="text" maxlength="60" placeholder="Goal 3" aria-label="Goal 3">
+    </section>
+
+  </main>
+
+  <canvas id="toys" aria-hidden="true"></canvas>
+
+  <div class="toy-tools">
+    <button id="more-button" class="toy-tool" type="button" data-label="Drop more" aria-label="Drop more">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+    <button id="clear-button" class="toy-tool" type="button" data-label="Clear toys" aria-label="Clear toys">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>
+    </button>
+    <button id="shake-button" class="toy-tool" type="button" data-label="Shake the desk" aria-label="Shake the desk">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12l4-6 4 12 4-12 4 12 4-6"/></svg>
+    </button>
+  </div>
+
+  <script>
+    (function () {
+      // The example schedule is what visitors see first: my own plan for a
+      // study day, one row per hour. It is hardcoded so there is always
+      // something to show.
+      var EXAMPLE = [
+        ["07:00", "08:00", "Wake up, quick breakfast"],
+        ["08:00", "09:00", "Review lecture notes"],
+        ["09:00", "10:00", "Lecture / class"],
+        ["10:00", "11:00", "Lecture / class"],
+        ["11:00", "12:00", "Problem set work"],
+        ["12:00", "13:00", "Lunch"],
+        ["13:00", "14:00", "CSCI 598E: AI agents lab"],
+        ["14:00", "15:00", "Study group"],
+        ["15:00", "16:00", "Reading"],
+        ["16:00", "17:00", "Code practice"],
+        ["17:00", "18:00", "Workout"],
+        ["18:00", "19:00", "Dinner"],
+        ["19:00", "20:00", "Review the day"],
+        ["20:00", "21:00", "Personal project time"],
+        ["21:00", "22:00", "Reading"],
+        ["22:00", "23:00", "Wind down"],
+        ["23:00", "24:00", "Sleep prep"]
+      ];
+
+      var tableBody = document.getElementById("study-table-body");
+      var scrollBox = document.getElementById("schedule-scroll");
+      var tryButton = document.getElementById("try-it-button");
+      var viewExampleButton = document.getElementById("view-example-button");
+      var addRowButton = document.getElementById("add-row-button");
+      var clockEl = document.getElementById("live-clock-time");
+      var nowLine = document.getElementById("now-line");
+      var progressText = document.getElementById("progress-text");
+      var progressFill = document.getElementById("progress-fill");
+      var progressBar = document.getElementById("progress-bar");
+
+      // ---------- small helpers ----------
+
+      // "HH:MM" -> minutes since midnight; "24:00" is allowed for end of day.
+      function toMinutes(clock) {
+        var parts = clock.split(":");
+        return parseInt(parts[0], 10) * 60 + parseInt(parts[1], 10);
+      }
+
+      function toClock(minutes) {
+        var m = ((minutes % 1440) + 1440) % 1440;
+        var h = Math.floor(m / 60);
+        var mm = m % 60;
+        return (h < 10 ? "0" : "") + h + ":" + (mm < 10 ? "0" : "") + mm;
+      }
+
+      function formatClock(clock) {
+        var minutes = toMinutes(clock) % 1440;
+        var h = Math.floor(minutes / 60);
+        var mm = minutes % 60;
+        var period = h < 12 ? "AM" : "PM";
+        var display = h % 12 === 0 ? 12 : h % 12;
+        return display + ":" + (mm < 10 ? "0" : "") + mm + " " + period;
+      }
+
+      function pad(n) { return (n < 10 ? "0" : "") + n; }
+
+      // Everything a visitor types stays only in their own browser. It is
+      // never sent anywhere, and it never overwrites the example above.
+      function readStore(key, fallback) {
+        try {
+          var raw = localStorage.getItem(key);
+          if (raw) return JSON.parse(raw);
+        } catch (e) {
+          // Storage can be blocked (private windows, some browser settings);
+          // falling back keeps the page working either way.
+        }
+        return fallback;
+      }
+
+      function writeStore(key, value) {
+        try {
+          localStorage.setItem(key, JSON.stringify(value));
+        } catch (e) {
+          // If storage is blocked, edits just won't persist across reloads.
+        }
+      }
+
+      function blankRows() {
+        return EXAMPLE.map(function (row) {
+          return { start: row[0], end: row[1], task: "", done: false };
+        });
+      }
+
+      function loadOwnTasks() {
+        var saved = readStore("studyRoomOwnTasks", null);
+        if (!saved) return blankRows();
+        return saved.map(function (row) {
+          // Older saves stored a single hour number instead of a range.
+          if (row.start === undefined) {
+            return {
+              start: toClock(row.time * 60),
+              end: toClock((row.time + 1) * 60),
+              task: row.task,
+              done: row.done
+            };
+          }
+          return row;
+        });
+      }
+
+      function saveOwnTasks(tasks) { writeStore("studyRoomOwnTasks", tasks); }
+
+      function getMode() {
+        try {
+          return localStorage.getItem("studyRoomMode") || "example";
+        } catch (e) {
+          return "example";
+        }
+      }
+
+      function setMode(mode) {
+        try {
+          localStorage.setItem("studyRoomMode", mode);
+        } catch (e) {
+          // Not fatal: the buttons still work for this page view.
+        }
+      }
+
+      // ---------- the schedule's live state ----------
+
+      // Gives each row one of: current (red ring), current + done (green
+      // ring), or past (faded). Also fills the "now / next" line and the
+      // progress bar. Runs every second and after every edit.
+      function refreshState() {
+        var now = new Date();
+        var nowMinutes = now.getHours() * 60 + now.getMinutes();
+        var rows = Array.prototype.slice.call(tableBody.rows);
+        var current = null;
+        var next = null;
+        var doneCount = 0;
+
+        rows.forEach(function (tr) {
+          var start = parseInt(tr.dataset.start, 10);
+          var end = parseInt(tr.dataset.end, 10);
+          var checkbox = tr.querySelector('input[type="checkbox"]');
+          var done = checkbox.checked;
+          var valid = !isNaN(start) && !isNaN(end);
+          var active = false;
+          var past = false;
+
+          if (valid && end > start) {
+            active = nowMinutes >= start && nowMinutes < end;
+            past = nowMinutes >= end;
+          } else if (valid) {
+            active = nowMinutes >= start || nowMinutes < end;
+          }
+
+          if (done) doneCount++;
+          if (active && !current) current = tr;
+          if (valid && start > nowMinutes && (!next || start < parseInt(next.dataset.start, 10))) {
+            next = tr;
+          }
+
+          tr.classList.toggle("is-done", done);
+          tr.classList.toggle("current-row", active);
+          tr.classList.toggle("done-now", active && done);
+          tr.classList.toggle("ending", active && !done && valid && end > start && end - nowMinutes <= 5);
+          tr.classList.toggle("past-row", past && !active);
+        });
+
+        if (current) {
+          var left = parseInt(current.dataset.end, 10) - nowMinutes;
+          var label = current.dataset.label || "(no task written)";
+          nowLine.textContent = "Now: " + label + (left > 0 && left < 1440 ? " (" + left + " min left)" : "");
+        } else if (next) {
+          var wait = parseInt(next.dataset.start, 10) - nowMinutes;
+          nowLine.textContent = "Free right now. Next: " + (next.dataset.label || "(no task written)") +
+            " at " + formatClock(toClock(parseInt(next.dataset.start, 10))) + " (in " + wait + " min)";
+        } else {
+          nowLine.textContent = "Nothing scheduled right now.";
+        }
+
+        var total = rows.length;
+        var percent = total ? Math.round((doneCount / total) * 100) : 0;
+        progressText.textContent = doneCount + " of " + total + " done";
+        progressFill.style.width = percent + "%";
+        progressBar.setAttribute("aria-valuenow", percent);
+      }
+
+      function scrollToCurrent() {
+        var tr = tableBody.querySelector(".current-row");
+        if (!tr) return;
+        scrollBox.scrollTop = tr.offsetTop - scrollBox.clientHeight / 2 + tr.offsetHeight / 2;
+      }
+
+      function tickClock() {
+        var now = new Date();
+        clockEl.textContent = pad(now.getHours()) + ":" + pad(now.getMinutes()) + ":" + pad(now.getSeconds());
+        refreshState();
+      }
+
+      // ---------- rendering the table ----------
+
+      function renderExample() {
+        var doneList = readStore("studyRoomExampleDone", []);
+        tableBody.innerHTML = "";
+        EXAMPLE.forEach(function (row, index) {
+          var tr = document.createElement("tr");
+          tr.dataset.start = toMinutes(row[0]);
+          tr.dataset.end = toMinutes(row[1]);
+          tr.dataset.label = row[2];
+
+          var timeCell = document.createElement("td");
+          timeCell.className = "time-cell";
+          timeCell.textContent = formatClock(row[0]) + " to " + formatClock(row[1]);
+          tr.appendChild(timeCell);
+
+          var taskCell = document.createElement("td");
+          taskCell.className = "task-cell";
+          taskCell.textContent = row[2];
+          tr.appendChild(taskCell);
+
+          var doneCell = document.createElement("td");
+          var checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.checked = !!doneList[index];
+          checkbox.setAttribute("aria-label", "Done");
+          checkbox.addEventListener("change", function () {
+            var list = readStore("studyRoomExampleDone", []);
+            list[index] = checkbox.checked;
+            writeStore("studyRoomExampleDone", list);
+            refreshState();
+          });
+          doneCell.appendChild(checkbox);
+          tr.appendChild(doneCell);
+
+          tr.appendChild(document.createElement("td"));
+
+          tableBody.appendChild(tr);
+        });
+        refreshState();
+        scrollToCurrent();
+      }
+
+      function renderOwn(tasks) {
+        tableBody.innerHTML = "";
+        tasks.forEach(function (row, index) {
+          var tr = document.createElement("tr");
+          tr.dataset.start = toMinutes(row.start);
+          tr.dataset.end = toMinutes(row.end);
+          tr.dataset.label = row.task;
+
+          function timeInput(field, label) {
+            var input = document.createElement("input");
+            input.type = "time";
+            input.value = row[field];
+            input.setAttribute("aria-label", label);
+            input.addEventListener("change", function () {
+              if (!input.value) return;
+              tasks[index][field] = input.value;
+              tr.dataset[field] = toMinutes(input.value);
+              saveOwnTasks(tasks);
+              refreshState();
+            });
+            return input;
+          }
+
+          var timeCell = document.createElement("td");
+          timeCell.className = "time-cell";
+          timeCell.appendChild(timeInput("start", "Start time"));
+          timeCell.appendChild(document.createTextNode(" to "));
+          timeCell.appendChild(timeInput("end", "End time"));
+          tr.appendChild(timeCell);
+
+          var taskCell = document.createElement("td");
+          taskCell.className = "task-cell";
+          var input = document.createElement("input");
+          input.type = "text";
+          input.value = row.task;
+          input.placeholder = "What are you doing then?";
+          input.addEventListener("input", function () {
+            tasks[index].task = input.value;
+            tr.dataset.label = input.value;
+            saveOwnTasks(tasks);
+            refreshState();
+          });
+          taskCell.appendChild(input);
+          tr.appendChild(taskCell);
+
+          var doneCell = document.createElement("td");
+          var checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.checked = row.done;
+          checkbox.setAttribute("aria-label", "Done");
+          checkbox.addEventListener("change", function () {
+            tasks[index].done = checkbox.checked;
+            saveOwnTasks(tasks);
+            refreshState();
+          });
+          doneCell.appendChild(checkbox);
+          tr.appendChild(doneCell);
+
+          var removeCell = document.createElement("td");
+          var remove = document.createElement("button");
+          remove.type = "button";
+          remove.className = "remove-row";
+          remove.textContent = "Remove";
+          remove.setAttribute("aria-label", "Remove this row");
+          remove.addEventListener("click", function () {
+            tasks.splice(index, 1);
+            saveOwnTasks(tasks);
+            renderOwn(tasks);
+          });
+          removeCell.appendChild(remove);
+          tr.appendChild(removeCell);
+
+          tableBody.appendChild(tr);
+        });
+        refreshState();
+        scrollToCurrent();
+      }
+
+      var ownTasks = null;
+
+      function showExampleView() {
+        setMode("example");
+        tryButton.hidden = false;
+        viewExampleButton.hidden = true;
+        addRowButton.hidden = true;
+        renderExample();
+      }
+
+      function showOwnView() {
+        setMode("own");
+        tryButton.hidden = true;
+        viewExampleButton.hidden = false;
+        addRowButton.hidden = false;
+        ownTasks = loadOwnTasks();
+        renderOwn(ownTasks);
+      }
+
+      addRowButton.addEventListener("click", function () {
+        var last = ownTasks[ownTasks.length - 1];
+        var start = last ? last.end : "09:00";
+        ownTasks.push({
+          start: start,
+          end: toClock(toMinutes(start) + 60),
+          task: "",
+          done: false
+        });
+        saveOwnTasks(ownTasks);
+        renderOwn(ownTasks);
+      });
+
+      tryButton.addEventListener("click", showOwnView);
+      viewExampleButton.addEventListener("click", showExampleView);
+
+      // ---------- focus timer ----------
+
+      var pomoTime = document.getElementById("pomo-time");
+      var pomoStart = document.getElementById("pomo-start");
+      var pomoReset = document.getElementById("pomo-reset");
+      var pomoFocus = document.getElementById("pomo-focus");
+      var pomoBreak = document.getElementById("pomo-break");
+      var pomoCard = document.querySelector(".pomo-card");
+      var pomoLength = 25 * 60;
+      var pomoLeft = pomoLength;
+      var pomoEndsAt = 0;
+      var pomoTimer = null;
+
+      function drawPomo() {
+        pomoTime.textContent = pad(Math.floor(pomoLeft / 60)) + ":" + pad(pomoLeft % 60);
+      }
+
+      function stopPomo() {
+        clearInterval(pomoTimer);
+        pomoTimer = null;
+        pomoStart.textContent = "Start";
+      }
+
+      function setPomoMode(seconds) {
+        stopPomo();
+        pomoLength = seconds;
+        pomoLeft = seconds;
+        pomoFocus.classList.toggle("chip-on", seconds === 25 * 60);
+        pomoBreak.classList.toggle("chip-on", seconds === 5 * 60);
+        drawPomo();
+      }
+
+      pomoStart.addEventListener("click", function () {
+        if (pomoTimer) {
+          pomoLeft = Math.max(0, Math.round((pomoEndsAt - Date.now()) / 1000));
+          stopPomo();
+          return;
+        }
+        pomoEndsAt = Date.now() + pomoLeft * 1000;
+        pomoStart.textContent = "Pause";
+        pomoTimer = setInterval(function () {
+          pomoLeft = Math.max(0, Math.round((pomoEndsAt - Date.now()) / 1000));
+          drawPomo();
+          if (pomoLeft === 0) {
+            var wasFocus = pomoLength === 25 * 60;
+            stopPomo();
+            pomoCard.classList.add("flash");
+            setTimeout(function () { pomoCard.classList.remove("flash"); }, 3000);
+            setPomoMode(wasFocus ? 5 * 60 : 25 * 60);
+          }
+        }, 250);
+      });
+
+      pomoReset.addEventListener("click", function () { setPomoMode(pomoLength); });
+      pomoFocus.addEventListener("click", function () { setPomoMode(25 * 60); });
+      pomoBreak.addEventListener("click", function () { setPomoMode(5 * 60); });
+
+      // ---------- top 3 notes ----------
+
+      var noteInputs = document.querySelectorAll(".note");
+      var savedNotes = readStore("studyRoomTop3", ["", "", ""]);
+      Array.prototype.forEach.call(noteInputs, function (input, index) {
+        input.value = savedNotes[index] || "";
+        input.addEventListener("input", function () {
+          savedNotes[index] = input.value;
+          writeStore("studyRoomTop3", savedNotes);
+        });
+      });
+
+      // ---------- start ----------
+
+      if (getMode() === "own") {
+        showOwnView();
+      } else {
+        showExampleView();
+      }
+
+      tickClock();
+      setInterval(tickClock, 1000);
+    })();
+  </script>
+
+  <script src="matter.min.js"></script>
+  <script src="toys.js"></script>
 
 </body>
 </html>

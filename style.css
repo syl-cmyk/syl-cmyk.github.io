@@ -1,82 +1,550 @@
-/* A deliberately small starting point.
-   It exists to prove one thing: this file is loading.
-   If you can see spacing and a readable line length, the path in index.html works.
-
-   Delete all of it whenever you want. */
-
 :root {
-  /* Makes the page follow the reader's light or dark mode setting, for free. */
-  color-scheme: light dark;
+  /* A fixed "campus library" look: cream paper cards on a green desk. */
+  color-scheme: only light;
+  --paper: #f6f0e1;
+  --ink: #1b2a41;
+  --felt: #12302a;
+  --navy: #1b2a41;
+  --accent: #9d2235;
+  --gold: #d4a943;
+  --red: #c81e2b;
+  --green: #1e8e3e;
+  --serif: Georgia, "Iowan Old Style", "Times New Roman", serif;
+}
+
+/* Lets the current row's tint pulse smoothly. */
+@property --tint {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 0%;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-
-  /* 65ch caps the line at about 65 characters. Long lines are genuinely hard
-     to read, and this single rule does more for legibility than anything else
-     in this file. */
-  max-width: 65ch;
-
   margin: 0 auto;
-  padding: 4rem 1.5rem;
-  line-height: 1.6;
-  font-size: 1.125rem;
+  max-width: 1100px;
+  padding: 6rem 1.25rem 4rem;
+  line-height: 1.5;
+  font-size: 1.05rem;
+
+  color: var(--ink);
+  background: transparent;
+}
+
+/* A walnut desk seen from above: procedural wood grain (no image file),
+   with a warm lamp glow at the top. It sits on html so it always fills the
+   whole window, whatever the size, with no edges showing. */
+html {
+  min-height: 100%;
+  background-color: #3b2415;
+  background-image:
+    radial-gradient(ellipse 70% 45% at 50% 0%, rgba(255, 214, 120, 0.30), transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1800' height='1200'%3E%3Cfilter id='w'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.0025 0.045' numOctaves='3' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.34 0 0 0 0 0.17 0 0 0 1.1 -0.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' fill='%233b2415'/%3E%3Crect width='100%25' height='100%25' filter='url(%23w)'/%3E%3C/svg%3E");
+  background-size: auto, cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
 }
 
 h1 {
-  font-size: 3rem;
-  line-height: 1.1;
-  margin-bottom: 1.5rem;
-}
-
-p {
-  margin-bottom: 1.5rem;
-}
-
-/* First section in the page, so this introduces the base spacing and
-   heading size for any section — this one and any added later. */
-
-section {
-  margin-top: 3rem;
-}
-
-h2 {
-  font-size: 1.5rem;
-  line-height: 1.2;
-  margin-bottom: 0.75rem;
-}
-
-/* Three project cards in a row. CSS Grid gives exact control over "3 across,
-   then 1 down on a phone" without relying on flex-wrap's implicit wrapping.
-   Card borders use currentColor instead of a fixed color so they keep working
-   in both light and dark mode, the same free trick color-scheme already buys us. */
-
-.project-cards {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.project-card {
-  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
-  padding: 1rem;
-}
-
-.project-card h3 {
-  font-size: 1.125rem;
+  font-family: var(--serif);
+  font-size: 2.4rem;
+  line-height: 1.05;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   margin-bottom: 0.5rem;
 }
 
-.project-card p {
+h2 {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  line-height: 1.2;
+}
+
+/* ---------- the desk: cards laid out side by side ---------- */
+
+.desk {
+  display: grid;
+  gap: 1.75rem;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "sign"
+    "clock"
+    "schedule"
+    "pomo"
+    "progress"
+    "notes";
+}
+
+@media (min-width: 900px) {
+  .desk {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    grid-template-areas:
+      "sign     clock"
+      "schedule pomo"
+      "schedule progress"
+      "schedule notes";
+  }
+}
+
+.card {
+  border: 3px solid var(--ink);
+  border-radius: 0.6rem;
+  box-shadow: 6px 6px 0 var(--accent);
+  padding: 1rem 1.25rem;
+  color: var(--ink);
+  background-color: var(--paper);
+  transform: rotate(var(--tilt, 0deg));
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: rotate(0deg);
+}
+
+.sign {
+  grid-area: sign;
+  --tilt: -1.5deg;
+  background: var(--navy);
+  color: var(--paper);
+  border-color: var(--gold);
+  box-shadow: 6px 6px 0 var(--accent), 0 0 0 4px var(--navy);
+}
+
+.sign-tag {
+  font-family: var(--serif);
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.35rem;
+}
+.clock-card { grid-area: clock; --tilt: 1deg; }
+.schedule-card { grid-area: schedule; --tilt: 0deg; min-width: 0; }
+.pomo-card { grid-area: pomo; --tilt: -1deg; }
+.progress-card { grid-area: progress; --tilt: 1deg; }
+.notes-card { grid-area: notes; --tilt: -0.5deg; background: #fff3b0; }
+
+@media (max-width: 899px) {
+  .card {
+    --tilt: 0deg;
+  }
+}
+
+.card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 0.75rem;
   margin-bottom: 0.75rem;
 }
 
-/* The page's first breakpoint. 37.5rem (600px) sits comfortably above real
-   phone widths and comfortably below laptop widths, so cards stack on a
-   phone and stay in a row everywhere wider. */
+.card-label {
+  display: block;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
 
-@media (max-width: 37.5rem) {
-  .project-cards {
-    grid-template-columns: 1fr;
+/* ---------- clock ---------- */
+
+.live-clock-time {
+  display: block;
+  font-size: 2.6rem;
+  font-weight: bold;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.now-line {
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+}
+
+/* ---------- buttons ---------- */
+
+.study-room-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.arrow-hint {
+  font-size: 1.4rem;
+}
+
+.cartoon-button {
+  border: none;
+  border-radius: 1.5rem;
+  padding: 0.5rem 1.1rem;
+  font: inherit;
+  font-weight: bold;
+  color: white;
+  background: linear-gradient(180deg, #c23a4d, #9d2235);
+  box-shadow: 0 4px 0 #6b1523, 0 6px 10px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+
+.cartoon-button:hover {
+  filter: brightness(1.05);
+}
+
+.cartoon-button:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #6b1523, 0 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+.cartoon-button-secondary {
+  background: linear-gradient(180deg, #3d5a80, #1b2a41);
+  box-shadow: 0 4px 0 #0d1522, 0 6px 10px rgba(0, 0, 0, 0.25);
+}
+
+.cartoon-button-secondary:active {
+  box-shadow: 0 2px 0 #0d1522, 0 3px 6px rgba(0, 0, 0, 0.25);
+}
+
+/* ---------- schedule table ---------- */
+
+.schedule-scroll {
+  max-height: 360px;
+  overflow: auto;
+  max-width: 100%;
+  position: relative;
+}
+
+.study-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.study-table th,
+.study-table td {
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+}
+
+.study-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: var(--paper);
+}
+
+.study-table .time-cell {
+  white-space: nowrap;
+}
+
+.study-table input[type="text"] {
+  width: 100%;
+  font: inherit;
+  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.5rem;
+  background: transparent;
+  color: inherit;
+}
+
+.study-table input[type="time"] {
+  font: inherit;
+  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  border-radius: 0.375rem;
+  padding: 0.2rem 0.3rem;
+  background: transparent;
+  color: inherit;
+}
+
+.study-table input[type="checkbox"] {
+  width: 1.15rem;
+  height: 1.15rem;
+  cursor: pointer;
+}
+
+.remove-row {
+  font: inherit;
+  font-size: 0.8rem;
+  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  border-radius: 0.375rem;
+  padding: 0.125rem 0.5rem;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* Row states. A ring is drawn per cell (top and bottom on every cell,
+   left on the first, right on the last) so it reads as one frame. */
+
+.study-table tr {
+  --ring: transparent;
+  --ring-w: 0px;
+}
+
+.study-table tr.current-row {
+  --ring: var(--red);
+  --ring-w: 3px;
+  animation: glow 1.4s ease-in-out infinite;
+  font-weight: bold;
+}
+
+.study-table tr.current-row.ending {
+  animation-duration: 0.5s;
+}
+
+.study-table tr.current-row.done-now {
+  --ring: var(--green);
+  --tint: 16%;
+  animation: none;
+}
+
+.study-table tr.current-row td {
+  background-color: color-mix(in srgb, var(--ring) var(--tint), transparent);
+  box-shadow:
+    inset 0 var(--ring-w) 0 var(--ring),
+    inset 0 calc(var(--ring-w) * -1) 0 var(--ring);
+}
+
+.study-table tr.current-row td:first-child {
+  box-shadow:
+    inset var(--ring-w) 0 0 var(--ring),
+    inset 0 var(--ring-w) 0 var(--ring),
+    inset 0 calc(var(--ring-w) * -1) 0 var(--ring);
+}
+
+.study-table tr.current-row td:last-child {
+  box-shadow:
+    inset calc(var(--ring-w) * -1) 0 0 var(--ring),
+    inset 0 var(--ring-w) 0 var(--ring),
+    inset 0 calc(var(--ring-w) * -1) 0 var(--ring);
+}
+
+.study-table tr.past-row {
+  opacity: 0.55;
+}
+
+.study-table tr.past-row.is-done .task-cell,
+.study-table tr.past-row.is-done .task-cell input {
+  text-decoration: line-through;
+}
+
+@keyframes glow {
+  0%, 100% { --tint: 6%; }
+  50% { --tint: 30%; }
+}
+
+/* ---------- focus timer ---------- */
+
+.chips {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.chip {
+  font: inherit;
+  font-size: 0.85rem;
+  border: 2px solid var(--ink);
+  border-radius: 1rem;
+  padding: 0.1rem 0.7rem;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.chip-on {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+  font-weight: bold;
+}
+
+.pomo-time {
+  font-size: 3rem;
+  font-weight: bold;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 0.75rem;
+}
+
+.pomo-buttons {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.pomo-card.flash {
+  animation: flash 0.5s steps(2, jump-none) 6;
+}
+
+@keyframes flash {
+  50% { background-color: color-mix(in srgb, var(--gold) 60%, var(--paper)); }
+}
+
+/* ---------- progress ---------- */
+
+.progress-text {
+  margin: 0.25rem 0 0.6rem;
+}
+
+.progress {
+  height: 1.25rem;
+  border: 3px solid var(--ink);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0;
+  background: var(--green);
+  transition: width 0.3s ease;
+}
+
+/* ---------- top 3 notes ---------- */
+
+.notes-card h2 {
+  margin-bottom: 0.5rem;
+}
+
+.note {
+  display: block;
+  width: 100%;
+  font: inherit;
+  margin-bottom: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  border: none;
+  border-bottom: 2px dashed color-mix(in srgb, currentColor 45%, transparent);
+  background: transparent;
+  color: inherit;
+}
+
+.note:last-child {
+  margin-bottom: 0;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .study-table tr.current-row,
+  .pomo-card.flash {
+    animation: none;
   }
+
+  .card {
+    transition: none;
+  }
+}
+
+/* ---------- desk toys ---------- */
+
+#toys {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.toy-tools {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  opacity: 0.55;
+  transition: opacity 0.2s ease;
+}
+
+.toy-tools:hover,
+.toy-tools:focus-within {
+  opacity: 1;
+}
+
+/* Tiny round icon controls: quiet at rest, with a label that appears to the
+   left after the mouse rests on one for half a second. */
+.toy-tool {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  color: rgba(246, 240, 225, 0.9);
+  background: rgba(20, 12, 6, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.toy-tool svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.toy-tool:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.toy-tool:active {
+  transform: translateY(1px);
+}
+
+.toy-tool::after {
+  content: attr(data-label);
+  position: absolute;
+  right: calc(100% + 0.5rem);
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0.25rem 0.6rem;
+  border-radius: 0.4rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  color: rgba(246, 240, 225, 0.95);
+  background: rgba(20, 12, 6, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease 0s;
+}
+
+.toy-tool:hover::after {
+  opacity: 1;
+  transition-delay: 0.5s;
+}
+
+.toy-tool:focus-visible::after {
+  opacity: 1;
+}
+
+body.dragging-toy {
+  cursor: grabbing;
+  user-select: none;
+  -webkit-user-select: none;
 }
