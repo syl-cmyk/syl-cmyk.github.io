@@ -14,7 +14,7 @@ Delete these instructions when you are done, or leave them. It does not matter.
 What you wanted at the start, and what is actually live now.
 Name one thing you dropped or added along the way, and why.
 
-*Your answer here.*
+"I first decided on a theme for the site: an interactive study room instead of a generic portfolio page. I then added the Study Room feature we built together — an hour-by-hour task table with an example view and a 'try it yourself' mode that lets a visitor fill in their own tasks, saved only in their own browser. Along the way I dropped the Projects section, since it did not fit the direction the site ended up taking.
 
 ---
 
@@ -28,7 +28,7 @@ Say which you picked, what the alternative was, and what you gave up by not taki
 
 "There was no alternative" is not an answer. Find the fork.
 
-*Your answer here.*
+"There was a fork here: make the Study Room a static display showing only my own example schedule, or make it something visitors can actually use themselves. I picked the second option — a 'Try it yourself' button that clears my example and lets visitors fill in their own hourly tasks, saved only in their own browser. The alternative (static display) would have been simpler to build, since it needs no input handling or storage, but it would just be something to look at rather than something a visitor could actually use."
 
 ---
 

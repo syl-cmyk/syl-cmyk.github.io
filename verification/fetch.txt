@@ -1,0 +1,32 @@
+$ curl -s -o /dev/null -w 'HTTP %{http_code}\n' https://syl-cmyk.github.io/
+HTTP 200
+
+$ curl -s https://syl-cmyk.github.io/ | grep -o 'Study Room'
+Study Room
+
+$ curl -sI https://syl-cmyk.github.io/style.css
+HTTP/1.1 200 OK
+Connection: keep-alive
+Content-Length: 11094
+Server: GitHub.com
+Content-Type: text/css; charset=utf-8
+Last-Modified: Sat, 19 Sep 2026 19:35:29 GMT
+Access-Control-Allow-Origin: *
+Strict-Transport-Security: max-age=31556952
+ETag: "6aaee401-2b56"
+expires: Tue, 22 Sep 2026 01:56:09 GMT
+Cache-Control: max-age=600
+x-proxy-cache: MISS
+X-GitHub-Request-Id: 87B6:798C9:542182:5A7DFF:6AB1DDE1
+x-github-edge-region: iad
+Accept-Ranges: bytes
+Date: Tue, 22 Sep 2026 01:48:23 GMT
+Via: 1.1 varnish
+Age: 133
+X-Served-By: cache-den-kden1300063-DEN
+X-Cache: HIT
+X-Cache-Hits: 1
+X-Timer: S1790041703.124139,VS0,VE2
+Vary: Accept-Encoding
+X-Fastly-Request-ID: c559b25649e6ac8f1535165e78f41a50826a8f62
+
