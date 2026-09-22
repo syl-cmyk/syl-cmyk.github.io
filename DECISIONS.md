@@ -14,7 +14,8 @@ Delete these instructions when you are done, or leave them. It does not matter.
 What you wanted at the start, and what is actually live now.
 Name one thing you dropped or added along the way, and why.
 
-"I first decided on a theme for the site: an interactive study room instead of a generic portfolio page. I then added the Study Room feature we built together — an hour-by-hour task table with an example view and a 'try it yourself' mode that lets a visitor fill in their own tasks, saved only in their own browser. Along the way I dropped the Projects section, since it did not fit the direction the site ended up taking.
+I first decided on a theme for the site: an interactive study room instead of a generic portfolio page. Then I added the Study Room feature: an hour-by-hour task table with an example view and a 'try it yourself' mode that lets a visitor fill in their own tasks, saved only in their own browser. 
+For what changed: At first the schedule was a table with a fixed one-hour row for each line. I later changed it to custom time blocks (like 2 hours, 3 hours), and added toys.js, a small feature that lets you interact with the page in a fun way.
 
 ---
 
@@ -26,9 +27,8 @@ What goes on the front page and what does not.
 
 Say which you picked, what the alternative was, and what you gave up by not taking it.
 
-"There was no alternative" is not an answer. Find the fork.
 
-"There was a fork here: make the Study Room a static display showing only my own example schedule, or make it something visitors can actually use themselves. I picked the second option — a 'Try it yourself' button that clears my example and lets visitors fill in their own hourly tasks, saved only in their own browser. The alternative (static display) would have been simpler to build, since it needs no input handling or storage, but it would just be something to look at rather than something a visitor could actually use."
+There was a fork here: make the Study Room a static display showing only my own example schedule, or make it something visitors can actually use themselves. I picked the second option which was a 'Try it yourself' button that clears my example and lets visitors fill in their own hourly tasks, saved only in their own browser. The alternative would have been simpler to build, since it needs no input handling or storage, but it would just be something to look at rather than something a visitor could actually use.
 
 ---
 
@@ -42,7 +42,7 @@ If it genuinely never happened, say so plainly, and then say what you would have
 check in order to notice. Being honest here costs you far less than a story you cannot
 defend when you record your video.
 
-*Your answer here.*
+At first I noticed that my background's resolution didn't adjust as I resized the browser window. I explained the issue to the AI, and it claimed: 'I moved the background from body to html... body previously had max-width: 1100px, so the background tended to follow that narrow box, and when the window was wider than that, dark edges would show on the sides. Now the background fills the entire window, and cover will automatically scale with the window size.' But after checking, I found it hadn't actually been fixed, so I kept explaining the issue in the prompt and had it fix it.
 
 ---
 
@@ -55,7 +55,9 @@ A check that could not have failed is not a check.
 
 Link to your `verification/` folder.
 
-*Your answer here.*
+When I first opened the live URL, I still saw the old interface. I later found out this was a browser caching issue (confirmed by doing a hard refresh [Cmd+Shift+R]), not a deployment failure. What would have made this check fail: if opening it in an incognito window also showed the unstyled version, that would mean something was actually wrong.
+
+See the verification/ folder for the screenshot, fetch.txt, and README.md
 
 ---
 
@@ -66,4 +68,4 @@ fully understand.
 
 What would you do next, and how would you find out?
 
-*Your answer here.*
+I'd also like the 'Shake the desk' button to not just shake the toys, but also make the edges of every card/section shake. Like add a brief shake animation class to each .card, and trigger it on all the cards at once when the button is pressed.
